@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Alert, TouchableOpacity, Text, useWindowDimensions } from 'react-native';
 import { CameraView, useCameraPermissions, BarcodeScanningResult, CameraType } from 'expo-camera';
+import ScannedModal from './components/ScanModal';
 
 export default function BarcodeScanner() {
   const { width, height } = useWindowDimensions();
@@ -16,6 +17,7 @@ export default function BarcodeScanner() {
   const [barcodeBounds, setBarcodeBounds] = useState<any>(null);
   const [barcodeData, setBarcodeData] = useState<string | null>(null);
   const [cameraFacing, setCameraFacing] = useState<CameraType>('back');
+  const [modalVisible, setModalVisible] = useState(false);
   const cameraRef = useRef<CameraView | null>(null);
 
   useEffect(() => {
@@ -44,23 +46,24 @@ export default function BarcodeScanner() {
       setScanned(true);
       setBarcodeBounds(result.bounds);
       setBarcodeData(result.data);
-      Alert.alert(
-        'Barcode Scanned',
-        `Data: ${result.data}`,
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              setBarcodeBounds(null);
-              setTimeout(() => {
-                setScanned(false);
-                setBarcodeData(null);
-              }, 400);
-            },
-          },
-        ],
-        { cancelable: false }
-      );
+      setModalVisible(true);
+      // Alert.alert(
+      //   'Barcode Scanned',
+      //   `Data: ${result.data}`,
+      //   [
+      //     {
+      //       text: 'OK',
+      //       onPress: () => {
+      //         setBarcodeBounds(null);
+      //         setTimeout(() => {
+      //           setScanned(false);
+      //           setBarcodeData(null);
+      //         }, 400);
+      //       },
+      //     },
+      //   ],
+      //   { cancelable: false }
+      // );
     }
   };
 
@@ -68,13 +71,22 @@ export default function BarcodeScanner() {
     setCameraFacing((prevFacing: string) => (prevFacing === 'back' ? 'front' : 'back'));
   };
 
+  const completeSave = () => {
+    setBarcodeBounds(null);
+    setModalVisible(false);
+    setScanned(false);
+    setBarcodeData(null);
+    setTimeout(() => {
+      setScanned(false);
+      setBarcodeData(null);
+    }, 400);
+  };
+
   if (!permission) {
-    // camera permissions are still loading.
     return <View />;
   }
 
   if (!permission.granted) {
-    // camera permissions are not granted yet.
     return (
       <View className="flex-1 items-center justify-center p-4">
         <Text className="text-center">We need your permission to show the camera</Text>
@@ -114,6 +126,10 @@ export default function BarcodeScanner() {
       >
         <Text className="text-white text-lg">Flip Camera</Text>
       </TouchableOpacity>
+      <ScannedModal visible={modalVisible}
+        onClose={completeSave}
+        barcodeData={barcodeData}
+      />
     </View>
   );
 }
