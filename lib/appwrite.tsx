@@ -34,7 +34,7 @@ const avatars = new Avatars(client);
 const databases = new Databases(client);
 
 //registering a user
-export async function createUser(email: string, password: string, username: string) {
+export async function createUser(email: string, password: string, username: string, fullName: string) {
     try {
         const newAccount = await account.create(
             ID.unique(),
@@ -59,6 +59,7 @@ export async function createUser(email: string, password: string, username: stri
                 email: email,
                 username: username,
                 avatar: avatarUrl,
+                fullName: fullName,
             },
             [Permission.write(Role.user(newAccount.$id))],
         );

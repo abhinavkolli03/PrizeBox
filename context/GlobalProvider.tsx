@@ -5,6 +5,8 @@ export interface UserProps {
     id: string;
     name: string;
     email: string;
+    avatarUrl: string;
+    fullName: string;
 }
 
 export interface GlobalContextProps {
@@ -40,7 +42,9 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
                     const userData: UserProps = {
                         id: res.$id,
                         name: res.name,
+                        avatarUrl: res.avatar,
                         email: res.email,
+                        fullName: res.fullName,
                     };
                     setIsLoggedIn(true);
                     setUser(userData);

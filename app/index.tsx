@@ -10,7 +10,7 @@ import React from 'react';
 const PrizeBoxApp = () => {
   const { isLoading, isLoggedIn } = useGlobalContext();
 
-  if (!isLoading && isLoggedIn) return <Redirect href="/dashboard" />
+  if (!isLoading && isLoggedIn) return <Redirect href="/home" />
 
   return (
     <SafeAreaView className="h-full bg-black-100 dark:bg-black-100">

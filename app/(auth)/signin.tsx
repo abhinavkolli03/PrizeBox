@@ -1,4 +1,4 @@
-import { Text, View, ScrollView, Alert, Image, StyleSheet } from 'react-native';
+import { Text, View, ScrollView, Alert, Image, StyleSheet, KeyboardAvoidingView, Platform  } from 'react-native';
 import React, { useState } from 'react';
 import { Link, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -31,12 +31,14 @@ const SignIn = () => {
       if (result) {
         const userData: UserProps = {
             id: result.$id,
-            name: result.name,
+            name: result.username,
+            avatarUrl: result.avatar,
             email: result.email,
+            fullName: result.fullName
         };
         setUser(userData);
         setIsLoggedIn(true);
-        router.replace('/dashboard');
+        router.replace('/home');
       } else {
         throw new Error("Sign in failed.");
       }
@@ -49,10 +51,14 @@ const SignIn = () => {
 
   return (
     <SafeAreaView className="bg-black-100 h-full">
+    <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+    >
       <ScrollView>
         <View className="w-full justify-center min-h-[85vh] px-4 my-6">
           <Image source={images.logo} className="w-[115px] h-[115px] rounded-full overflow-hidden" />
-          <Text className="text-2xl text-white mb-8 font-semibold mt-10 font-psemibold">Log in to PrizeBox</Text>
+          <Text className="text-2xl text-white mb-8 font-semibold mt-10 font-psemibold">Log In to PrizeBox</Text>
           
           <FormField 
             title="Email"
@@ -79,7 +85,7 @@ const SignIn = () => {
           />
 
           <CustomButton 
-            title="Sign in"
+            title="Sign In"
             handlePress={submit}
             containerStyles='mt-7 bg-teal text-white'
             isLoading={isSubmitting}
@@ -93,6 +99,7 @@ const SignIn = () => {
           </View>
         </View>
       </ScrollView>
+    </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
