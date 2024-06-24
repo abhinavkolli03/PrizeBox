@@ -14,7 +14,13 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import BarcodeDigitizer from './BarcodeDigitizer';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const ScanModal = ({ visible, onClose, barcodeData }) => {
+interface ScanModalProps {
+    visible: boolean;
+    onClose: () => void;
+    barcodeData: string;
+}
+
+const ScanModal: React.FC<ScanModalProps> = ({ visible, onClose, barcodeData }) => {
   const [vendor, setVendor] = useState('');
   const [couponType, setCouponType] = useState('cash discount');
   const [rewardDetail, setRewardDetail] = useState('');
@@ -22,13 +28,13 @@ const ScanModal = ({ visible, onClose, barcodeData }) => {
   const [expirationDate, setExpirationDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const handleDateChange = (event, selectedDate) => {
+  const handleDateChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || expirationDate;
     setShowDatePicker(false);
     setExpirationDate(currentDate);
   };
 
-  const getSymbolForCouponType = (type) => {
+  const getSymbolForCouponType = (type: string) => {
     switch (type) {
       case 'cash discount':
         return <Icon name="dollar" size={20} color="#000" />;
@@ -102,8 +108,8 @@ const ScanModal = ({ visible, onClose, barcodeData }) => {
                     style={{ flex: 1 }}
                 />
               </View>
-              <BarcodeDigitizer data={barcodeData} isQRCode={isQRCode} />
-              <TouchableOpacity
+              <BarcodeDigitizer data={barcodeData}/>
+              <TouchableOpacity 
                 className="bg-orange-500 p-4 rounded mt-4"
                 onPress={onClose}
               >

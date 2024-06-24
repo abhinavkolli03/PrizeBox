@@ -3,7 +3,11 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import Barcode from 'react-native-barcode-svg';
 
-const BarcodeDigitizer = ({ data }) => {
+interface BarcodeDigitizerProps {
+    data: string;
+}
+
+const BarcodeDigitizer:React.FC<BarcodeDigitizerProps> = ({ data }) => {
   return (
     <View className="flex items-center justify-center mt-4">
       <Barcode
