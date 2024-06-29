@@ -8,26 +8,22 @@ interface TabIconProps {
   color: string;
   name: string;
   focused: boolean;
-  isScan?: boolean;
 }
 
-const TabIcon: React.FC<TabIconProps> = ({ icon, color, name, focused, isScan }) => {
+const TabIcon: React.FC<TabIconProps> = ({ icon, color, name, focused }) => {
   return (
-    <View style={[styles.iconContainer, isScan && styles.scanIconContainer]}>
+    <View style={styles.iconContainer}>
       <FontAwesome 
         name={icon}
-        size={isScan ? 36 : 24}
-        color={isScan ? "#FFFFFF" : color}
-        style={isScan && styles.scanIcon}
+        size={24}
+        color={color}
       />
-      {!isScan && (
-        <Text
-          className={`${focused ? "font-psemibold" : "font-pregular"} text-xs mt-2`}
-          style={{ color: color }}
-        >
-          {name}
-        </Text>
-      )}
+      <Text
+        className={`${focused ? "font-psemibold" : "font-pregular"} text-xs mt-2`}
+        style={{ color: color }}
+      >
+        {name}
+      </Text>
     </View>
   );
 }
@@ -64,21 +60,6 @@ const TabsLayout: React.FC = () => {
           }}
         />
         <Tabs.Screen 
-          name="board"
-          options={{
-            title: 'Board',
-            headerShown: false,
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon 
-                icon="bookmark"
-                color={color}
-                name="Board"
-                focused={focused}
-              />
-            )
-          }}
-        />
-        <Tabs.Screen 
           name="scan"
           options={{
             title: 'Scan',
@@ -89,21 +70,20 @@ const TabsLayout: React.FC = () => {
                 color={color}
                 name="Scan"
                 focused={focused}
-                isScan
               />
             )
           }}
         />
         <Tabs.Screen 
-          name="share"
+          name="upload"
           options={{
-            title: 'Share',
+            title: 'Upload',
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <TabIcon 
-                icon="group"
+                icon="upload"
                 color={color}
-                name="Share"
+                name="Upload"
                 focused={focused}
               />
             )
@@ -133,18 +113,6 @@ const styles = StyleSheet.create({
   iconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  scanIconContainer: {
-    width: 72, 
-    height: 72,
-    borderRadius: 36, 
-    backgroundColor: '#02807d',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-  },
-  scanIcon: {
-    color: '#FFFFFF',
   },
 });
 
