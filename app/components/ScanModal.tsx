@@ -209,6 +209,12 @@ const ScanModal: React.FC<ScanModalProps> = ({ visible, onClose, barcodeData }) 
               >
                 <Text className="text-white text-center text-lg font-pbold">Save</Text>
               </TouchableOpacity>
+              <TouchableOpacity 
+                className="bg-red-700 p-4 rounded-lg mt-4"
+                onPress={onClose}
+              >
+                <Text className="text-white text-center text-lg font-pbold">Close</Text>
+              </TouchableOpacity>
             </ScrollView>
           </View>
         </View>
