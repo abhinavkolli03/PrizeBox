@@ -9,7 +9,7 @@ interface BarcodeDigitizerProps {
 
 const BarcodeDigitizer:React.FC<BarcodeDigitizerProps> = ({ data }) => {
   return (
-    <View className="flex items-center justify-center border border-teal-200 mt-4 pt-4 pb-4 rounded-lg">
+    <View className="flex items-center justify-center mt-4 pt-4 pb-4 rounded-lg">
       <Barcode
         value={data}
         format="CODE128"

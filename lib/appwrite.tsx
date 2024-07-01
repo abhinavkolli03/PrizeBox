@@ -10,6 +10,7 @@ import {
     Permission,
     Role
 } from "react-native-appwrite";
+import { Float } from "react-native/Libraries/Types/CodegenTypes";
 
 export const appwriteConfig = {
     endpoint: 'https://cloud.appwrite.io/v1',
@@ -120,170 +121,210 @@ export async function signOut() {
     }
 }
 
-interface FileUpload {
-    mimeType: string,
-    name: string;
-    size: number;
-    uri: string;
-    [key: string]: any;
-}
-
-function convertToFileUpload(file: File): FileUpload {
-    return {
-        mimeType: file.type,
-        name: file.name || 'default_name',
-        size: file.size || 0,
-        uri: file.name || 'default_url',
-    };
-}
-
-//uploading a new file
-export async function uploadFile(fileUpload: FileUpload | null, type: string) {
-    if (!fileUpload) return;
-
-    const asset = {
-        name: fileUpload.name,
-        type: fileUpload.mimeType,
-        size: fileUpload.size,
-        uri: fileUpload.uri
-    };
-
+//creating a new card document
+export async function createCard(vendor: string, couponType: string, rewardDetail: Float, description: string, expirationDate: Date, barcodeData: string, userId: string) {
     try {
-        const uploadedFile = await storage.createFile(
-            appwriteConfig.activeCards_storageId,
-            ID.unique(),
-            asset
-        );
-
-        const fileUrl = await getFilePreview(uploadedFile.$id, type);
-        return fileUrl;
-    } catch (error) {
-        throw new Error(error as string)
-    }
-}
-
-//retrieving file preview
-export async function getFilePreview(fileId: string, type: string) {
-    let fileUrl;
-    
-    try {
-        if (type === "video") {
-            fileUrl = storage.getFileView(appwriteConfig.activeCards_storageId, fileId);
-        } 
-        else if (type === "image") {
-            fileUrl = storage.getFilePreview(
-                appwriteConfig.activeCards_storageId,
-                fileId,
-                2000,
-                20000,  
-                "top" as ImageGravity,
-                100
-            )
-        }
-        else {
-            throw new Error("Invalid file type");
-        }
-        if (!fileUrl) throw Error;
-
-        return fileUrl;
-    } catch (error) {
-        throw new Error(error as string);
-    }
-}
-
-interface VideoPostForm {
-    thumbnail: File;
-    video: File;
-    title: string;
-    prompt: string;
-    userId: string;
-}
-
-//creating video post
-export async function createVideoPost(form: VideoPostForm) {
-    try {
-        const [thumbnailUrl, videoUrl] = await Promise.all([
-            uploadFile(convertToFileUpload(form.thumbnail), "image"),
-            uploadFile(convertToFileUpload(form.video), "video"),
-        ])
-
-        const newPost = await databases.createDocument(
+        console.log(userId)
+        const newCard = await databases.createDocument(
             appwriteConfig.databaseId,
             appwriteConfig.cardsCollectionId,
             ID.unique(),
             {
-                title: form.title,
-                thumbnail: thumbnailUrl,
-                video: videoUrl,
-                prompt: form.prompt, 
-                creator: form.userId,
+                vendor: vendor,
+                reward_type: couponType,
+                reward_amount: rewardDetail,
+                description: description,
+                expiration: expirationDate.toISOString(),
+                scanned_code: barcodeData,
+                redeemed: false,
+                vendor_avatar: 'https://cloud.appwrite.io/v1/storage/buckets/6678d9eb0022f9f4b9a1/files/6681deca000dfa5c08f1/view?project=6678d4a20006356740f4&mode=admin',
+                customer: userId
             }
         );
-        return newPost;
+        return newCard;
     } catch (error) {
         throw new Error(error as string);
     }
 }
 
-//get all video posts
-export async function getAllPosts() {
+//getting all the cards for a specific user
+export async function getAllUserCards(userId: string) {
     try {
-        const posts = await databases.listDocuments(
-            appwriteConfig.databaseId,
-            appwriteConfig.cardsCollectionId
-        )
-
-        return posts.documents;
-    } catch (error) {
-        throw new Error(error as string);
-    }
-}
-
-//get video posts that match search query
-export async function searchPosts(query: string) {
-    try {
-        const posts = await databases.listDocuments(
+        const cards = await databases.listDocuments(
             appwriteConfig.databaseId,
             appwriteConfig.cardsCollectionId,
-            [Query.search("title", query)]
+            [Query.equal("customer", userId)]
         );
-
-        if (!posts) throw new Error("something went wrong...");
-
-        return posts.documents;
+        return cards.documents;
     } catch (error) {
         throw new Error(error as string);
     }
 }
 
-//get latest created video posts
-export async function getLatestPosts() {
-    try {
-        const posts = await databases.listDocuments(
-            appwriteConfig.databaseId,
-            appwriteConfig.cardsCollectionId,
-            [Query.orderDesc("$createdAt"), Query.limit(7)]
-        )
-        return posts.documents;
-    } catch (error) {
-        throw new Error(error as string);
-    }
-}
 
-//get user video posts
-export async function getUserPosts(userId: string) {
-    try {
-        const posts = await databases.listDocuments(
-            appwriteConfig.databaseId,
-            appwriteConfig.cardsCollectionId,
-            [Query.equal("creator", userId)]
-        );
+// interface FileUpload {
+//     mimeType: string,
+//     name: string;
+//     size: number;
+//     uri: string;
+//     [key: string]: any;
+// }
 
-        if (!posts) throw new Error("something went wrong...");
+// function convertToFileUpload(file: File): FileUpload {
+//     return {
+//         mimeType: file.type,
+//         name: file.name || 'default_name',
+//         size: file.size || 0,
+//         uri: file.name || 'default_url',
+//     };
+// }
 
-        return posts.documents;
-    } catch (error) {
-        throw new Error(error as string);
-    }
-}
-// 666632d90032b9d35744
+// //uploading a new file
+// export async function uploadFile(fileUpload: FileUpload | null, type: string) {
+//     if (!fileUpload) return;
+
+//     const asset = {
+//         name: fileUpload.name,
+//         type: fileUpload.mimeType,
+//         size: fileUpload.size,
+//         uri: fileUpload.uri
+//     };
+
+//     try {
+//         const uploadedFile = await storage.createFile(
+//             appwriteConfig.activeCards_storageId,
+//             ID.unique(),
+//             asset
+//         );
+
+//         const fileUrl = await getFilePreview(uploadedFile.$id, type);
+//         return fileUrl;
+//     } catch (error) {
+//         throw new Error(error as string)
+//     }
+// }
+
+// //retrieving file preview
+// export async function getFilePreview(fileId: string, type: string) {
+//     let fileUrl;
+    
+//     try {
+//         if (type === "video") {
+//             fileUrl = storage.getFileView(appwriteConfig.activeCards_storageId, fileId);
+//         } 
+//         else if (type === "image") {
+//             fileUrl = storage.getFilePreview(
+//                 appwriteConfig.activeCards_storageId,
+//                 fileId,
+//                 2000,
+//                 20000,  
+//                 "top" as ImageGravity,
+//                 100
+//             )
+//         }
+//         else {
+//             throw new Error("Invalid file type");
+//         }
+//         if (!fileUrl) throw Error;
+
+//         return fileUrl;
+//     } catch (error) {
+//         throw new Error(error as string);
+//     }
+// }
+
+// interface VideoPostForm {
+//     thumbnail: File;
+//     video: File;
+//     title: string;
+//     prompt: string;
+//     userId: string;
+// }
+
+// //creating video post
+// export async function createVideoPost(form: VideoPostForm) {
+//     try {
+//         const [thumbnailUrl, videoUrl] = await Promise.all([
+//             uploadFile(convertToFileUpload(form.thumbnail), "image"),
+//             uploadFile(convertToFileUpload(form.video), "video"),
+//         ])
+
+//         const newPost = await databases.createDocument(
+//             appwriteConfig.databaseId,
+//             appwriteConfig.cardsCollectionId,
+//             ID.unique(),
+//             {
+//                 title: form.title,
+//                 thumbnail: thumbnailUrl,
+//                 video: videoUrl,
+//                 prompt: form.prompt, 
+//                 creator: form.userId,
+//             }
+//         );
+//         return newPost;
+//     } catch (error) {
+//         throw new Error(error as string);
+//     }
+// }
+
+// //get all video posts
+// export async function getAllPosts() {
+//     try {
+//         const posts = await databases.listDocuments(
+//             appwriteConfig.databaseId,
+//             appwriteConfig.cardsCollectionId
+//         )
+
+//         return posts.documents;
+//     } catch (error) {
+//         throw new Error(error as string);
+//     }
+// }
+
+// //get video posts that match search query
+// export async function searchPosts(query: string) {
+//     try {
+//         const posts = await databases.listDocuments(
+//             appwriteConfig.databaseId,
+//             appwriteConfig.cardsCollectionId,
+//             [Query.search("title", query)]
+//         );
+
+//         if (!posts) throw new Error("something went wrong...");
+
+//         return posts.documents;
+//     } catch (error) {
+//         throw new Error(error as string);
+//     }
+// }
+
+// //get latest created video posts
+// export async function getLatestPosts() {
+//     try {
+//         const posts = await databases.listDocuments(
+//             appwriteConfig.databaseId,
+//             appwriteConfig.cardsCollectionId,
+//             [Query.orderDesc("$createdAt"), Query.limit(7)]
+//         )
+//         return posts.documents;
+//     } catch (error) {
+//         throw new Error(error as string);
+//     }
+// }
+
+// //get user video posts
+// export async function getUserPosts(userId: string) {
+//     try {
+//         const posts = await databases.listDocuments(
+//             appwriteConfig.databaseId,
+//             appwriteConfig.cardsCollectionId,
+//             [Query.equal("creator", userId)]
+//         );
+
+//         if (!posts) throw new Error("something went wrong...");
+
+//         return posts.documents;
+//     } catch (error) {
+//         throw new Error(error as string);
+//     }
+// }

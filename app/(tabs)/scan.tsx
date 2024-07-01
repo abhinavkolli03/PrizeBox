@@ -125,23 +125,8 @@ export default function BarcodeScanner() {
           </View>
         </View>
       </View>
-      <View style={{ position: 'absolute', top: height / 10 - 30, width: width * 0.8, left: width * 0.1, flexDirection: 'row', backgroundColor: '#4B5563', borderRadius: 9999 }}>
-        <TouchableOpacity
-          onPress={() => setCameraMode('manual')}
-          style={{ flex: 1, padding: 8, borderTopLeftRadius: 9999, borderBottomLeftRadius: 9999, backgroundColor: cameraMode === 'manual' ? '#02807d' : '#6B7280', opacity: cameraMode === 'manual' ? 1 : 0.6, alignItems: 'center' }}
-        >
-          <Text style={{ color: '#FFFFFF', fontWeight: '600' }} className="font-psemibold">Manual</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setCameraMode('automatic')}
-          style={{ flex: 1, padding: 8, borderTopRightRadius: 9999, borderBottomRightRadius: 9999, backgroundColor: cameraMode === 'automatic' ? '#02807d' : '#6B7280', opacity: cameraMode === 'automatic' ? 1 : 0.6, alignItems: 'center' }}
-        >
-          <Text style={{ color: '#FFFFFF', fontWeight: '600' }} className="font-psemibold">Automatic</Text>
-        </TouchableOpacity>
-      </View>
 
-
-      <View className="absolute top-36 right-4 flex-col space-y-4">
+      <View className="absolute top-12 right-4 flex-col space-y-4">
         <TouchableOpacity onPress={toggleFlash} className="p-2 opacity-80 rounded-full" style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}>
           <FontAwesome name="flash" size={24} color="#FFF" />
         </TouchableOpacity>
